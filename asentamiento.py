@@ -31,22 +31,27 @@ with open('inserciones_asentamientos.sql', 'w') as file:
     for d_asenta, d_codigo, d_zona, c_tipo_asenta, c_mnpio, c_estado, c_cve_ciudad in asentamientos:
         # Generar la instrucción SQL
         if c_cve_ciudad:
-            sql = f"INSERT INTO asentamiento (nombre_asentamiento, codigo_asentamiento, zona, tipo_asentamiento, c_mnpio, c_estado, cve_ciudad) VALUES ('{d_asenta}', '{d_codigo}', '{d_zona}', '{c_tipo_asenta}', '{c_mnpio}', '{c_estado}', '{c_cve_ciudad}');"
-            sql = f"INSERT INTO asentamiento (descripción_asentamiento, id_codigo, zona, tipo_asentamiento, c_mnpio, c_estado, cve_ciudad) VALUES ('{d_asenta}', (
-                        SELECT id_codigo FROM codigo_postale WHERE id_municipio = (
-                            SELECT id_municipio
-                            FROM municipio
-                            WHERE id_estado = (
-                                SELECT id_estado
-                                FROM estado
-                                WHERE codigo_estado = '{c_estado}'
-                            ) AND codigo_municipio = '{c_mnpio}'
-                        ) AND codigo_codigo = '{d_codigo}'
-                    ), '{d_zona}', '{c_tipo_asenta}', '{c_mnpio}', '{c_estado}', '{c_cve_ciudad}');"
-            #INSERT INTO asentamiento (nombre_asentamiento, codigo_asentamiento, zona, tipo_asentamiento, c_mnpio, c_estado, cve_ciudad) VALUES ('Paseos de Santa Mónica', '20286', 'Urbano', '10', '1', '1', '1.0');
+            sql = f"""INSERT INTO asentamiento (descripcion_asentamiento, id_codigo, id_zona, id_tipo_asenta, id_ciudad) VALUES ('{d_asenta}', (
+                        SELECT id_codigo FROM codigo_postal WHERE codigo_codigo = '{d_codigo}'
+                    ),
+                    (
+                        SELECT id_zona FROM zona WHERE descripcion_zona = '{d_zona}'
+                    ),
+                    (
+                        SELECT id_tipo_asenta FROM tipo_asentamiento WHERE codigo_tipo_asenta = '{c_tipo_asenta}'
+                    ),
+                    (
+                        SELECT id_ciudad FROM ciudad WHERE codigo_cve_ciudad = '{c_cve_ciudad}' AND id_estado = (SELECT id_estado FROM estado WHERE codigo_estado = '{c_estado}')
+                    ));"""
         else:
-            sql = f"INSERT INTO asentamiento (nombre_asentamiento, codigo_asentamiento, zona, tipo_asentamiento, c_mnpio, c_estado, cve_ciudad) VALUES ('{d_asenta}', '{d_codigo}', '{d_zona}', '{c_tipo_asenta}', '{c_mnpio}', '{c_estado}', NULL);"
-        
+            sql = f"""INSERT INTO asentamiento (descripcion_asentamiento, id_codigo, id_zona, id_tipo_asentamiento) VALUES ('{d_asenta}', (
+                        SELECT id_codigo FROM codigo_postal WHERE codigo_codigo = '{d_codigo}'
+                    ), 
+                    (
+                        SELECT id_zona FROM zona WHERE descripcion_zona = '{d_zona}'
+                    ), (
+                        SELECT id_tipo_asentamiento FROM tipo_asentamiento WHERE codigo_tipo_asenta = '{c_tipo_asenta}'
+                    ));"""
         file.write(sql + '\n')
 
 print("Instrucciones de inserción generadas en 'inserciones_asentamientos.sql'")

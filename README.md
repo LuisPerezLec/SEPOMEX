@@ -24,3 +24,6 @@ Generar las ciudades con ciudad.py e insertar el archivo generado `ciudades.sql`
 
 Generar los códigos postales con codigo.py e insertar el archivo generado `codigos.sql` en el contenedor con:
 `docker exec -i sepomex psql -U postgres -d sepomex -f /dev/stdin < inserciones_codigos.sql`
+
+Generar los asentamientos con asentamiento.py e insertar el archivo generado `asentamientos.sql` en el contenedor con:
+`docker exec -i sepomex psql -U postgres -d sepomex -f /dev/stdin < inserciones_asentamientos.sql`
