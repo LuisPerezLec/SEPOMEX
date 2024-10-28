@@ -13,8 +13,8 @@ for hoja in xls.sheet_names:
 
     # Asegurarse de que las columnas existen
     if all(col in df.columns for col in ['d_asenta', 'd_codigo', 'd_zona', 'c_tipo_asenta', 'c_mnpio', 'c_estado', 'c_cve_ciudad']):
-        # Filtrar filas no nulas y agregar los pares a la lista
-        for _, row in df[['d_asenta', 'd_codigo', 'd_zona', 'c_tipo_asenta', 'c_mnpio', 'c_estado', 'c_cve_ciudad']].dropna().iterrows():
+        # Filtrar filas con datos relevantes
+        for _, row in df.iterrows():
             valor_asentamiento = (
                 row['d_asenta'], 
                 row['d_codigo'], 
@@ -44,13 +44,13 @@ with open('inserciones_asentamientos.sql', 'w') as file:
                         SELECT id_ciudad FROM ciudad WHERE codigo_cve_ciudad = '{c_cve_ciudad}' AND id_estado = (SELECT id_estado FROM estado WHERE codigo_estado = '{c_estado}')
                     ));"""
         else:
-            sql = f"""INSERT INTO asentamiento (descripcion_asentamiento, id_codigo, id_zona, id_tipo_asentamiento) VALUES ('{d_asenta}', (
+            sql = f"""INSERT INTO asentamiento (descripcion_asentamiento, id_codigo, id_zona, id_tipo_asenta) VALUES ('{d_asenta}', (
                         SELECT id_codigo FROM codigo_postal WHERE codigo_codigo = '{d_codigo}'
                     ), 
                     (
                         SELECT id_zona FROM zona WHERE descripcion_zona = '{d_zona}'
                     ), (
-                        SELECT id_tipo_asentamiento FROM tipo_asentamiento WHERE codigo_tipo_asenta = '{c_tipo_asenta}'
+                        SELECT id_tipo_asenta FROM tipo_asentamiento WHERE codigo_tipo_asenta = '{c_tipo_asenta}'
                     ));"""
         file.write(sql + '\n')
 
